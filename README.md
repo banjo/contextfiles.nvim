@@ -109,6 +109,22 @@ The output format is a simple table containing the following fields:
 
 To create custom prompts in `CodeCompanion`, you can use the extension provided by `contextfiles`. Use the util functions in a custom prompt to get the context files. It will be formatted to work with the CodeCompanion chat buffer.
 
+First you need to add it to the dependencies for `CodeCompanion`:
+
+```lua
+
+{ "olimorris/codecompanion.nvim",
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+    "nvim-treesitter/nvim-treesitter",
+    "banjo/contextfiles.nvim",
+  },
+  -- ...
+}
+```
+
+And then create your prompt:
+
 ```lua
 ["context"] = {
   strategy = "chat",
