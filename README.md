@@ -1,6 +1,6 @@
 # contextfiles.nvim
 
-A Neovim plugin to scan, match, and format context files (or project files) for use in AI assistants and other tools.
+A Neovim plugin to scan, match, and format context files for use in AI assistants and other tools. Grab your favorite rules from e.g. `.cursor/rules` and use them to provide context to your AI assistant.
 
 ## Features
 
