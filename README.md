@@ -1,4 +1,4 @@
-# context-files.nvim
+# contextfiles.nvim
 
 A Neovim plugin to scan, match, and format context files (or project files) for use in AI assistants and other tools.
 
@@ -15,7 +15,7 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
 {
-  "banjo/context-files.nvim",
+  "banjo/contextfiles.nvim",
 }
 ```
 
@@ -26,7 +26,7 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 You can get all the context files for the current file by using the `get_context_files` function.
 
 ```lua
-local context = require("context-files")
+local context = require("contextfiles")
 
 local current_file_path = vim.api.nvim_buf_get_name(0)
 local files = context.get_context_files(current_file_path, { context_dir = ".cursor/rules" })
@@ -42,7 +42,7 @@ local files = context.get_context_files(current_file_path, { gist_ids = { "<gist
 
 ### Format files to one string
 
-context-files provides a simple way to concatonate all files to a simple string.
+contextfiles provides a simple way to concatonate all files to a simple string.
 
 ```lua
 
@@ -108,7 +108,7 @@ The output format is a simple table containing the following fields:
 
 ### CodeCompanion
 
-To create custom prompts in `CodeCompanion`, you can use the extension provided by `context-files`. Use the util functions in a custom prompt to get the context files. It will be formatted to work with the CodeCompanion chat buffer.
+To create custom prompts in `CodeCompanion`, you can use the extension provided by `contextfiles`. Use the util functions in a custom prompt to get the context files. It will be formatted to work with the CodeCompanion chat buffer.
 
 ```lua
 ["context"] = {
@@ -124,7 +124,7 @@ To create custom prompts in `CodeCompanion`, you can use the extension provided 
         contains_code = true,
       },
       content = function(context)
-        local ctx = require("context-files.extensions.codecompanion")
+        local ctx = require("contextfiles.extensions.codecompanion")
 
         local ctx_opts = {
           -- ...

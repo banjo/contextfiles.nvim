@@ -1,4 +1,4 @@
-local core = require("context-files.core")
+local core = require("contextfiles.core")
 
 local M = {}
 
