@@ -16,7 +16,6 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 ```lua
 {
   "banjo/context-files.nvim",
-  lazy = true, -- Only load when explicitly required
 }
 ```
 
@@ -41,7 +40,19 @@ You can fetch context files from GitHub Gists by passing the gist ids. If you wa
 local files = context.get_context_files(current_file_path, { gist_ids = { "<gist_id>" }, enable_local = false })
 ```
 
+### Format files to one string
+
+context-files provides a simple way to concatonate all files to a simple string.
+
+```lua
+
+local files = context.get_context_files(current_file_path)
+local formatted = context.format(files, { separator = "\n" })
+```
+
 ## Default options
+
+### Context options
 
 ```lua
 {
@@ -56,6 +67,21 @@ local files = context.get_context_files(current_file_path, { gist_ids = { "<gist
 - `root_markers`: The root markers to look for when scanning for context files. Files that mark the root folder. Default: `[".git"]`
 - `gist_ids`: The gist ids to fetch context files from. Default: `{}`
 - `enable_local`: Enable local scanning. Default: `true`
+
+### Format options
+
+```lua
+
+{
+  prefix = "Here is context for the current file, separated by `---`: \n\n---",
+  suffix = "\n\n---\n\n The following is the user prompt: \n\n---\n\n",
+  separator = "\n\n---\n\n",
+}
+```
+
+- `prefix`: The prefix to add to the formatted string. Default: `Here is context for the current file, separated by '---': \n\n---`
+- `suffix`: The suffix to add to the formatted string. Default: `\n\n---\n\n The following is the user prompt: \n\n---\n\n`
+- `separator`: The separator to add between each context file. Default: `\n\n---\n\n`
 
 ## Output format
 
@@ -77,6 +103,44 @@ The output format is a simple table containing the following fields:
   },
 }
 ```
+
+## Extensions
+
+### CodeCompanion
+
+To create custom prompts in `CodeCompanion`, you can use the extension provided by `context-files`. Use the util functions in a custom prompt to get the context files. It will be formatted to work with the CodeCompanion chat buffer.
+
+```lua
+["context"] = {
+  strategy = "chat",
+  description = "Chat with context files",
+  opts = {
+    -- ...
+  },
+  prompts = {
+    {
+      role = "user",
+      opts = {
+        contains_code = true,
+      },
+      content = function(context)
+        local ctx = require("context-files.extensions.codecompanion")
+
+        local ctx_opts = {
+          -- ...
+        }
+        local format_opts = {
+          -- ...
+        }
+
+        return ctx.get(context.filename, ctx_opts, format_opts)
+      end,
+    },
+  },
+}
+```
+
+- All `#` will be replaced with `-` as they are used as separators in the chat buffer.
 
 ## Default behaviors
 
