@@ -4,10 +4,9 @@ A Neovim plugin to scan, match, and format context files (or project files) for 
 
 ## Features
 
-- Scan project directories for contextual rule files (e.g. `.cursor/rules`)
-- Match files based on glob patterns in frontmatter (e.g. `match: "*.md"`)
-- Fetch contexts from GitHub Gists
-- Format contexts for various AI assistant integrations
+- 📁 Scan project directories for contextual rule files (e.g. `.cursor/rules`)
+- 🔍 Match files based on glob patterns in frontmatter (e.g. `match: "*.md"`)
+- ☁️ Fetch contexts from GitHub Gists
 
 ## Installation
 
