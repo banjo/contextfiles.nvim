@@ -52,7 +52,7 @@ local formatted = context.format(files, { separator = "\n" })
 
 ## Project files
 
-It is possible to read more about what Cursor calls project files [here](https://docs.cursor.com/context/rules-for-ai). In short terms, it is basically files that allow you to add context to specific files. This plugin will allow you to scan for the appropriate files based on the what file file you provide, and the specified glob pattern in the context file. A lot of examples can be found [here](https://cursor.directory/).
+It is possible to read more about what Cursor calls project files [here](https://docs.cursor.com/context/rules-for-ai). In short terms, it is basically files that allow you to add context to specific files. This plugin will allow you to scan for the appropriate files based on the what file file you provide, and the specified glob pattern in the context file. A lot of examples can be found [here](https://cursor.directory/rules).
 
 ```md
 ---
