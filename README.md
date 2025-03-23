@@ -21,6 +21,8 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ## Usage
 
+- Add the appropriate context files in a folder in your repository (default is `.cursor/rules`)
+
 ### Scanning Context Files
 
 You can get all the context files for the current file by using the `get_context_files` function.
@@ -174,7 +176,30 @@ And then create your prompt:
 }
 ```
 
+The default folder for context files would be `.cursor/rules`, so by adding the following example file:
+
+```md
+---
+globs: ["**/*.md"]
+---
+
+# Markdown guidelines
+
+- Format this way
+- Do that
+```
+
+And opening the custom prompt in any markdown file:
+
+```lua
+
+require("codecompanion").prompt("context")
+```
+
+The buffer will be populated with the content of the context file.
+
 - All `#` will be replaced with `-` as they are used as separators in the chat buffer.
+- It works the same as the core API - you can get files from a local folder or from Github gists.
 
 ## Default behaviors
 
