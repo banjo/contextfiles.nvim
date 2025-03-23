@@ -1,12 +1,13 @@
 # contextfiles.nvim
 
-A Neovim plugin to scan, match, and format context files for use in AI assistants and other tools. Grab your favorite rules from e.g. `.cursor/rules` and use them to provide context to your AI assistant.
+A Neovim utility plugin to find related context files for a file. Scan for [Project files](https://docs.cursor.com/context/rules-for-ai) in your repository and add them to your LLM chats for optimal results.
 
 ## Features
 
 - 📁 Scan project directories for contextual rule files (e.g. `.cursor/rules`)
 - 🔍 Match files based on glob patterns in frontmatter (e.g. `match: "*.md"`)
 - ☁️ Fetch contexts from GitHub Gists
+- 🔨 Simple API - extend and do whatever you want with the files
 
 ## Installation
 
@@ -48,6 +49,24 @@ contextfiles provides a simple way to concatonate all files to a simple string.
 local files = context.get_context_files(current_file_path)
 local formatted = context.format(files, { separator = "\n" })
 ```
+
+## Project files
+
+It is possible to read more about what Cursor calls project files [here](https://docs.cursor.com/context/rules-for-ai). In short terms, it is basically files that allow you to add context to specific files. This plugin will allow you to scan for the appropriate files based on the what file file you provide, and the specified glob pattern in the context file.
+
+```md
+---
+globs: ["**/*.md"]
+---
+
+# Markdown guidelines
+
+- Format this way
+- Do that
+```
+
+- This file would be included if you would work in any `.md` markdown file in the repository
+- Only the content (below the frontmatter) would be included
 
 ## Default options
 
@@ -94,7 +113,7 @@ The output format is a simple table containing the following fields:
 {
   {
     file = ".cursor/rules/README.md",
-    patterns = { "*.md" },
+    patterns = { "**/*.md" },
     content = {
       "This is a context file",
       "It contains some rules",
