@@ -11,6 +11,9 @@ A Neovim utility plugin to find related context files for a file. Scan for [Proj
 
 ## Installation
 
+> ⚠️ **Warning**  
+> Neovim >= 0.11 is highly recommended to avoid any pattern matching issues (see [this issue](https://github.com/neovim/neovim/issues/28931) and [this PR](https://github.com/neovim/neovim/pull/29236))
+
 Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
