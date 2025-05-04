@@ -110,7 +110,7 @@ end
 
 --- Scans a directory for context files and extracts their patterns and content
 --- @param context_dir string The directory path to scan for context files
---- @return ContextFile[] array of context files found
+--- @return ContextFiles.ContextFile[] array of context files found
 local function scan_local_files(context_dir)
   local files = {}
   local scan_files = vim.fn.glob(context_dir .. "/*", false, true)
@@ -126,9 +126,9 @@ local function scan_local_files(context_dir)
 end
 
 -- Get the content of files whose patterns match the current file
----@param context_files ContextFile[] Array of  files found
+---@param context_files ContextFiles.ContextFile[] Array of  files found
 ---@param file_name_from_root_dir string The name of the current file relative to the project root
----@return ContextFile[] Array of  files whose patterns match the current file
+---@return ContextFiles.ContextFile[] Array of  files whose patterns match the current file
 local function get_matching_context_files(context_files, file_name_from_root_dir)
   local files = {}
 
@@ -153,7 +153,7 @@ end
 
 ---@param gist_id string The ID of the gist to fetch_gist_files
 ---@param source_file_name string The name of the source file
----@return ContextFile[] Array of context files found
+---@return ContextFiles.ContextFile[] Array of context files found
 local function fetch_gist_files(gist_id, source_file_name)
   local url = "https://api.github.com/gists/" .. gist_id
   local response = vim.fn.systemlist({ "curl", "-s", url })
@@ -177,7 +177,7 @@ end
 
 ---@param gist_ids string[] Array of gist IDs to fetch context files from
 ---@param source_file_name string The name of the source file
----@return ContextFile[] Array of files found
+---@return ContextFiles.ContextFile[] Array of files found
 local function get_gist_context_files(gist_ids, source_file_name)
   local gists = {}
 
@@ -191,20 +191,20 @@ local function get_gist_context_files(gist_ids, source_file_name)
   return gists
 end
 
----@class ContextFilesOptions
+---@class ContextFiles.Opts
 ---@field context_dir? string Directory containing  files (default: ".cursor/rules")
 ---@field root_markers? string[] Markers to identify the project root (default: {".git"})
 ---@field gist_ids? string[] Array of gist IDs to fetch context files from (default: {})
 ---@field enable_local? boolean Enable local scan of  files (default: true)
 
----@class ContextFile
----@field file string Path to the  file
+---@class ContextFiles.ContextFile
+---@field file string Path to the file
 ---@field patterns string[] Array of glob patterns parsed from the file
 ---@field content string[] Array of lines from the file with frontmatter removed
 
 ---@param file string Path to the current file
----@param opts? ContextFilesOptions Configuration options
----@return ContextFile[] Array of  files found
+---@param opts? ContextFiles.Opts Configuration options
+---@return ContextFiles.ContextFile[] Array of  files found
 function M.get_context_files(file, opts)
   opts = vim.tbl_deep_extend("force", M.OPTS_DEFAULTS, opts or {})
 
@@ -213,7 +213,7 @@ function M.get_context_files(file, opts)
   local has_gists = #opts.gist_ids > 0
 
   if vim.fn.isdirectory(absolute_context_dir) == 0 and opts.enable_local and not has_gists then
-    vim.api.nvim_err_writeln("Context directory does not exist")
+    vim.api.nvim_err_writeln("Context directory '" .. opts.context_dir .. "' does not exist")
     return {}
   end
 
@@ -237,14 +237,14 @@ function M.get_context_files(file, opts)
   return get_matching_context_files(files, file_name_from_root_dir)
 end
 
----@class FormatOpts
+---@class ContextFiles.FormatOpts
 ---@field prefix? string The prefix to use for the formatted string
 ---@field suffix? string The suffix to use for the formatted string
 ---@field separator? string The separator to use between each file content
 
----@param context_files ContextFile[] Array of context files found
----@param opts FormatOpts? Options for formatting the output
-function M.format(context_files, opts)
+---@param context_files ContextFiles.ContextFile[] Array of context files found
+---@param opts ContextFiles.FormatOpts? Options for formatting the output
+function M.format_multiple_files(context_files, opts)
   opts = vim.tbl_deep_extend("force", M.FORMAT_DEFAULTS, opts or {})
 
   if #context_files == 0 then
@@ -257,9 +257,37 @@ function M.format(context_files, opts)
     table.insert(contents, file_content)
   end
 
-  local str = opts.prefix .. table.concat(contents, opts.separator) .. opts.suffix
+  local prefix = opts.prefix
+  if type(opts.prefix) == "function" then
+    prefix = opts.prefix()
+  end
 
-  return str
+  local suffix = opts.suffix
+  if type(opts.suffix) == "function" then
+    suffix = opts.suffix()
+  end
+
+  return prefix .. table.concat(contents, opts.separator) .. suffix
+end
+
+---@param context_file ContextFiles.ContextFile the context file to format
+---@param opts ContextFiles.FormatOpts? Options for formatting the output
+function M.format(context_file, opts)
+  opts = vim.tbl_deep_extend("force", M.FORMAT_DEFAULTS, opts or {})
+
+  local content = table.concat(context_file.content, "\n")
+
+  local prefix = opts.prefix
+  if type(opts.prefix) == "function" then
+    prefix = opts.prefix(context_file)
+  end
+
+  local suffix = opts.suffix
+  if type(opts.suffix) == "function" then
+    suffix = opts.suffix(context_file)
+  end
+
+  return prefix .. content .. suffix
 end
 
 return M

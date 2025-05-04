@@ -11,7 +11,7 @@ A Neovim utility plugin to find related context files for a file. Scan for [Proj
 
 ## Installation
 
-> ⚠️ **Warning**  
+> ⚠️ **Warning**
 > Neovim >= 0.11 is highly recommended to avoid any pattern matching issues (see [this issue](https://github.com/neovim/neovim/issues/28931) and [this PR](https://github.com/neovim/neovim/pull/29236))
 
 Using [lazy.nvim](https://github.com/folke/lazy.nvim)
@@ -47,7 +47,7 @@ local files = context.get_context_files(current_file_path, { gist_ids = { "<gist
 
 ### Format files to one string
 
-contextfiles provides a simple way to concatonate all files to a simple string.
+contextfiles provides a simple way to concatenate all files to a simple string.
 
 ```lua
 
@@ -143,11 +143,49 @@ First you need to add it to the dependencies for `CodeCompanion`:
     "nvim-treesitter/nvim-treesitter",
     "banjo/contextfiles.nvim",
   },
+  extensions = {
+    contextfiles = {
+      opts = {
+        -- your contextfiles configuration here
+        -- or leave it empty to use the default configuration
+      },
+    },
+  },
   -- ...
 }
 ```
 
-And then create your prompt:
+<details>
+<summary>Default configuration</summary>
+
+```lua
+{
+  slash_command = {
+    enabled = true,
+    name = "context",
+    ctx_opts = {
+      context_dir = ".cursor/rules",
+      root_markers = { ".git" },
+      gist_ids = {},
+      enable_local = true,
+    },
+    format_opts = {
+      ---@param context_file ContextFiles.ContextFile the context file to prepend the prefix
+      prefix = function(context_file)
+        return string.format("Please follow the rules located at `%s`:", vim.fn.fnamemodify(context_file.file, ":."))
+      end,
+      suffix = "",
+      separator = "",
+    }
+  },
+}
+```
+
+</details>
+
+Then, you can use the slash command `/context` to include the context files in your chats.
+
+You can also use directly in your own prompts:
 
 ```lua
 ["context"] = {
@@ -163,7 +201,7 @@ And then create your prompt:
         contains_code = true,
       },
       content = function(context)
-        local ctx = require("contextfiles.extensions.codecompanion")
+        local ctx = require("codecompanion").extensions.contextfiles
 
         local ctx_opts = {
           -- ...
