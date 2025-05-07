@@ -87,7 +87,8 @@ function M.setup(opts)
         end,
         suffix = "",
         separator = "",
-      }
+      },
+      ctx_opts = core.OPTS_DEFAULTS,
     },
   }, opts or {})
 
