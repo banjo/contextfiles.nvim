@@ -113,7 +113,7 @@ end
 --- @return ContextFiles.ContextFile[] array of context files found
 local function scan_local_files(context_dir)
   local files = {}
-  local scan_files = vim.fn.glob(context_dir .. "/*", false, true)
+  local scan_files = vim.fn.globpath(context_dir, "**/*", false, true)
 
   for _, file in ipairs(scan_files) do
     if vim.fn.isdirectory(file) == 0 then
