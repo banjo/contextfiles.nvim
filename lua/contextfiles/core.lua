@@ -76,7 +76,7 @@ local function parse_glob_patterns(content)
         in_frontmatter = true
       end
     elseif in_frontmatter then
-      local globs = line:match("^globs:%s*(.+)$")
+      local globs = line:gsub("^%s*(.-)%s*$", "%1"):match("^globs:%s*(.+)$")
       if globs then
         -- Handle array format: globs: ["pattern1", "pattern2"]
         if globs:match("^%[.+%]$") then
