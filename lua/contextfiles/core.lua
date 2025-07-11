@@ -87,9 +87,11 @@ local function parse_glob_patterns(content)
             table.insert(patterns, pattern_match)
           end
         else
-          -- Handle simple string format: globs: pattern, removes quotes if present
-          local clean_glob = globs:gsub("^[\"'](.+)[\"']$", "%1")
-          table.insert(patterns, clean_glob)
+          -- Split by comma and trim whitespace/quotes
+          for pattern in globs:gmatch("[^,]+") do
+            local clean_glob = pattern:gsub("^%s*[\"']?(.-)[\"']?%s*$", "%1")
+            table.insert(patterns, clean_glob)
+          end
         end
         break
       end
@@ -289,5 +291,10 @@ function M.format(context_file, opts)
 
   return prefix .. content .. suffix
 end
+
+-- FOR TESTING PURPOSES ONLY
+M._test_parse_glob_patterns = parse_glob_patterns
+M._test_extract_content_after_frontmatter = extract_content_after_frontmatter
+M._test_get_matching_context_files = get_matching_context_files
 
 return M
