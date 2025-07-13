@@ -22,6 +22,17 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 }
 ```
 
+## Supported matching
+
+- Comma-separated patterns: `globs: *.ts,*.js`
+- Array syntax (recommended for complex patterns): `globs: ["*.ts", "*.js"]`
+- Single pattern: `globs: "*.lua"`
+- Patterns with brace expansion and array syntax: `globs: ["**/file.{ts,js}"]`
+- Patterns with brace expansion without array syntax: `globs: "**/file.{ts,js}"`
+- Patterns with spaces: `globs: [ "*.ts" , "*.js" ]`
+- Patterns with single or double quotes: `globs: ['*.ts','*.js']` or `globs: ["*.ts","*.js"]`
+- No globs: `key: rule applies to all files`
+
 ## Usage
 
 - Add the appropriate context files in a folder in your repository (default is `.cursor/rules`)

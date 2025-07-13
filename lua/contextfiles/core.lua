@@ -37,6 +37,31 @@ local function find_root_dir(file_path, root_markers)
   return root_dir
 end
 
+local function split_globs_preserving_braces(globs)
+  local patterns = {}
+  local current = ""
+  local brace_level = 0
+  for i = 1, #globs do
+    local c = globs:sub(i, i)
+    if c == "{" then
+      brace_level = brace_level + 1
+      current = current .. c
+    elseif c == "}" then
+      brace_level = brace_level - 1
+      current = current .. c
+    elseif c == "," and brace_level == 0 then
+      table.insert(patterns, current)
+      current = ""
+    else
+      current = current .. c
+    end
+  end
+  if current ~= "" then
+    table.insert(patterns, current)
+  end
+  return patterns
+end
+
 local function extract_content_after_frontmatter(content)
   local frontmatter_end = 0
 
@@ -88,7 +113,7 @@ local function parse_glob_patterns(content)
           end
         else
           -- Split by comma and trim whitespace/quotes
-          for pattern in globs:gmatch("[^,]+") do
+          for _, pattern in ipairs(split_globs_preserving_braces(globs)) do
             local clean_glob = pattern:gsub("^%s*[\"']?(.-)[\"']?%s*$", "%1")
             table.insert(patterns, clean_glob)
           end
