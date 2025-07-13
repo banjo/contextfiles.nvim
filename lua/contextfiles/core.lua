@@ -37,21 +37,39 @@ local function find_root_dir(file_path, root_markers)
   return root_dir
 end
 
-local function split_globs_preserving_braces(globs)
+local function split_globs_robust(globs)
   local patterns = {}
   local current = ""
-  local brace_level = 0
+  local brace_level, bracket_level = 0, 0
+  local in_single_quote, in_double_quote = false, false
+
   for i = 1, #globs do
     local c = globs:sub(i, i)
-    if c == "{" then
-      brace_level = brace_level + 1
+    if c == "'" and not in_double_quote then
+      in_single_quote = not in_single_quote
       current = current .. c
-    elseif c == "}" then
-      brace_level = brace_level - 1
+    elseif c == '"' and not in_single_quote then
+      in_double_quote = not in_double_quote
       current = current .. c
-    elseif c == "," and brace_level == 0 then
-      table.insert(patterns, current)
-      current = ""
+    elseif not in_single_quote and not in_double_quote then
+      if c == "{" then
+        brace_level = brace_level + 1
+        current = current .. c
+      elseif c == "}" then
+        brace_level = brace_level - 1
+        current = current .. c
+      elseif c == "[" then
+        bracket_level = bracket_level + 1
+        current = current .. c
+      elseif c == "]" then
+        bracket_level = bracket_level - 1
+        current = current .. c
+      elseif c == "," and brace_level == 0 and bracket_level == 0 then
+        table.insert(patterns, current)
+        current = ""
+      else
+        current = current .. c
+      end
     else
       current = current .. c
     end
@@ -113,7 +131,7 @@ local function parse_glob_patterns(content)
           end
         else
           -- Split by comma and trim whitespace/quotes
-          for _, pattern in ipairs(split_globs_preserving_braces(globs)) do
+          for _, pattern in ipairs(split_globs_robust(globs)) do
             local clean_glob = pattern:gsub("^%s*[\"']?(.-)[\"']?%s*$", "%1")
             table.insert(patterns, clean_glob)
           end

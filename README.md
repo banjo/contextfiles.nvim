@@ -5,7 +5,7 @@ A Neovim utility plugin to find related context files for a file. Scan for [Proj
 ## Features
 
 - 📁 Scan project directories for contextual rule files (e.g. `.cursor/rules`)
-- 🔍 Match files based on glob patterns in frontmatter (e.g. `match: "*.md"`)
+- 🔍 Match files based on glob patterns in frontmatter (e.g. `globs: "*.md"`)
 - ☁️ Fetch contexts from GitHub Gists
 - 🔨 Simple API - extend and do whatever you want with the files
 
@@ -22,16 +22,68 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 }
 ```
 
-## Supported matching
+## Supported glob pattern styles
 
-- Comma-separated patterns: `globs: *.ts,*.js`
-- Array syntax (recommended for complex patterns): `globs: ["*.ts", "*.js"]`
-- Single pattern: `globs: "*.lua"`
-- Patterns with brace expansion and array syntax: `globs: ["**/file.{ts,js}"]`
-- Patterns with brace expansion without array syntax: `globs: "**/file.{ts,js}"`
-- Patterns with spaces: `globs: [ "*.ts" , "*.js" ]`
-- Patterns with single or double quotes: `globs: ['*.ts','*.js']` or `globs: ["*.ts","*.js"]`
-- No globs: `key: rule applies to all files`
+You can specify glob patterns in your context files using several styles. **Quotes are always stripped from patterns before matching.**
+
+- **Comma-separated patterns:**
+  ```md
+  globs: *.ts,*.js
+  ```
+- **Array syntax (recommended for complex patterns):**
+  ```md
+  globs: ["*.ts", "*.js"]
+  globs: ['*.ts','*.js']
+  globs: [ "*.ts" , "*.js" ]
+  globs: ["*.ts", "*.js",]
+  globs: ["*.ts", '*.js']
+  ```
+- **Single pattern:**
+  ```md
+  globs: "*.lua"
+  globs: '*.lua'
+  globs: *.lua
+  ```
+- **Brace expansion:**
+  ```md
+  globs: **/file.{ts,js}
+  globs: ["**/file.{ts,js}"]
+  ```
+- **Patterns with character classes:**
+  ```md
+  globs: foo[ab,cd],bar
+  ```
+- **Patterns with commas inside quotes, braces, or brackets:**
+  ```md
+  globs: "foo,bar.js",baz.js
+  globs: foo,{bar,baz},qux
+  globs: foo[ab,cd],bar
+  globs: foo,{bar,[baz,qux]},other
+  ```
+  > Quotes are stripped, so `"foo,bar.js"` becomes `foo,bar.js`.
+- **No globs:**
+  If no `globs:` line is present, the rule applies to all files.
+
+### Example frontmatter
+
+```md
+---
+globs: ["**/*.md", "*.txt"]
+---
+# Markdown guidelines
+- Format this way
+- Do that
+```
+
+## Running Tests
+
+To run the plugin's tests, use:
+
+```bash
+make test
+```
+
+This will execute all tests in `tests/core_test.lua` using Neovim in headless mode.
 
 ## Usage
 
@@ -61,7 +113,6 @@ local files = context.get_context_files(current_file_path, { gist_ids = { "<gist
 contextfiles provides a simple way to concatenate all files to a simple string.
 
 ```lua
-
 local files = context.get_context_files(current_file_path)
 local formatted = context.format(files, { separator = "\n" })
 ```
@@ -74,9 +125,7 @@ It is possible to read more about what Cursor calls project files [here](https:/
 ---
 globs: ["**/*.md"]
 ---
-
 # Markdown guidelines
-
 - Format this way
 - Do that
 ```
@@ -105,7 +154,6 @@ globs: ["**/*.md"]
 ### Format options
 
 ```lua
-
 {
   prefix = "Here is context for the current file, separated by `---`: \n\n---",
   suffix = "\n\n---\n\n The following is the user prompt: \n\n---\n\n",
@@ -147,8 +195,8 @@ To create custom prompts in `CodeCompanion`, you can use the extension provided 
 First you need to add it to the dependencies for `CodeCompanion`:
 
 ```lua
-
-{ "olimorris/codecompanion.nvim",
+{
+  "olimorris/codecompanion.nvim",
   dependencies = {
     "nvim-lua/plenary.nvim",
     "nvim-treesitter/nvim-treesitter",
@@ -234,9 +282,7 @@ The default folder for context files would be `.cursor/rules`, so by adding the 
 ---
 globs: ["**/*.md"]
 ---
-
 # Markdown guidelines
-
 - Format this way
 - Do that
 ```
@@ -244,7 +290,6 @@ globs: ["**/*.md"]
 And opening the custom prompt in any markdown file:
 
 ```lua
-
 require("codecompanion").prompt("context")
 ```
 
