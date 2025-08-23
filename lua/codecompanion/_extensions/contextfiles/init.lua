@@ -39,21 +39,17 @@ local function register_slash_command(opts)
     description = "Add context files to the codebase.",
     ---@param chat CodeCompanion.Chat
     callback = function(chat)
-      local context_files = core.get_context_files(chat.context.filename, opts.slash_command.ctx_opts)
+      local context_files = core.get_context_files(chat.buffer_context.filename, opts.slash_command.ctx_opts)
 
       for _, context_file in ipairs(context_files) do
         local relative_path = vim.fn.fnamemodify(context_file.file, ":.")
         local id = "<file>" .. relative_path .. "</file>"
 
-        chat:add_message(
+        chat:add_context(
           { content = core.format(context_file, opts.slash_command.format_opts), role = "user" },
-          { visible = false, id = id }
+          "ContextFiles",
+          id or ""
         )
-        chat.references:add({
-          source = "ContextFiles",
-          name = context_file,
-          id = id or "",
-        })
       end
     end,
   }
