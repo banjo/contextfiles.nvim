@@ -21,7 +21,7 @@ local function register_slash_command(opts)
     return
   end
 
-  local slash_commands = require("codecompanion.config").config.strategies.chat.slash_commands
+  local slash_commands = require("codecompanion.config").config.interactions.chat.slash_commands
 
   if slash_commands[opts.slash_command.name] ~= nil then
     vim.notify(
