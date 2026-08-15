@@ -244,6 +244,50 @@ First you need to add it to the dependencies for `CodeCompanion`:
 
 Then, you can use the slash command `/context` to include the context files in your chats.
 
+#### Automatically add context files
+
+You can automatically add the context files when a CodeCompanion chat is opened by using CodeCompanion's `on_init` hook:
+
+```lua
+require("codecompanion").init({
+  hooks = {
+    on_init = function(ctx)
+      local ctxfiles = require("codecompanion").extensions.contextfiles
+      local filename = ctx.filename or vim.fn.expand("%")
+
+      if not filename or filename == "" then
+        return
+      end
+
+      local content = ctxfiles.get(filename, {
+        context_dir = ".cursor/rules",
+        root_markers = { ".git" },
+        gist_ids = {},
+        enable_local = true,
+      }, {
+        prefix = function(context_file)
+          return string.format("Please follow the rules located at `%s`:", vim.fn.fnamemodify(context_file.file, ":."))
+        end,
+        suffix = "",
+        separator = "",
+      })
+
+      if content and content ~= "" then
+        if ctx.insert then
+          ctx:insert(content)
+        elseif ctx.add_context then
+          ctx:add_context(content)
+        else
+          vim.api.nvim_buf_set_lines(ctx.buffer, 0, 0, false, vim.split(content, "\n", { trimempty = false }))
+        end
+      end
+    end,
+  },
+})
+```
+
+The `ctx_opts` and `format_opts` can be customized the same way as for the `/context` slash command.
+
 You can also use directly in your own prompts:
 
 ```lua
